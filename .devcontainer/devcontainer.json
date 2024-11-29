@@ -1,0 +1,39 @@
+{
+  "name": "Python 3.12 Development Container",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12", // Use the Python 3.12 image
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "workbench.colorTheme": "Night Owl", // Set the Night Owl theme
+        "python.analysis.typeCheckingMode": "strict", // Enable strict type checking in Pylance
+        "editor.formatOnSave": true, // Enable formatting on save
+        "python.formatting.provider": "ruff" // Set Ruff as the default formatter
+      },
+      "extensions": [
+        "ms-python.python", // Python support
+        "ms-python.vscode-pylance", // Pylance for Python language features and static type checking
+        "sdras.night-owl", // Night Owl Theme
+        "charliermarsh.ruff", // Ruff extension for Python linting and formatting
+        "natqe.reload" // Reload for VSCode
+      ]
+    }
+  },
+  "updateContentCommand": [
+    "curl -LsSf https://astral.sh/uv/install.sh | sh",
+    "export UV_LINK_MODE=copy",
+    "git config --global --add safe.directory /workspaces/memer"
+  ],
+  "remoteUser": "vscode",
+  "forwardPorts": [
+    8000
+  ], // Example: Forward port 8000 (commonly used for web servers)
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached" // Mount project directory to the container
+  ],
+  "postStartCommand": [
+    "echo \"DevContainer ready!\""
+  ]
+}
