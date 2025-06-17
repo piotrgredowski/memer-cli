@@ -1,16 +1,17 @@
 import rich
 import typer
 
-from memer.utils.settings import configuration
+from memer.core.container import get_container
 from memer.utils.settings import get_config_path
 
-app = typer.Typer(no_args_is_help=configuration.interface.typer.no_arg_is_help)
+app = typer.Typer(no_args_is_help=True)
 
 
 @app.command()
 def show() -> None:
     """Logs the configuration."""
-    rich.print(configuration.model_dump())
+    container = get_container()
+    rich.print(container.configuration.model_dump())
 
 
 @app.command()

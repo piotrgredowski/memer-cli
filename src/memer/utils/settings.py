@@ -394,7 +394,7 @@ def get_config_path() -> Path:
     return (Path(user_config_dir(appname=APP_NAME)) / "config.yaml").resolve()
 
 
-def load_configuration() -> Configuration:
+def load_configuration(config_path: Path | None = None) -> Configuration:
     """Loads the configuration from a file.
 
     If the configuration file is not found, it generates one from default settings and saves it.
@@ -405,7 +405,8 @@ def load_configuration() -> Configuration:
     Raises:
         MissingConfigurationError: If the configuration file is missing and cannot be generated.
     """
-    config_path = get_config_path()
+    if config_path is None:
+        config_path = get_config_path()
     try:
         logger.debug("Loading configuration from %s", config_path)
 
@@ -459,11 +460,5 @@ def get_user_data_templates_path() -> Path:
     return Path(user_data_dir(appname=APP_NAME)).resolve() / "templates"
 
 
-_configuration = load_configuration()
-
-# Save the user data path to the configuration in case settings were removed
-_configuration.images.templates.search_paths.add(get_user_data_templates_path())
-# TODO(Mateusz): its not so nice that we have to dump it before we export it
-dump_configuration(configuration=_configuration)
-
-configuration = _configuration
+# Global configuration is now managed through dependency injection
+# See memer.core.container for the new approach

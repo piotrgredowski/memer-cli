@@ -14,7 +14,7 @@ from rich.table import Table
 from memer.utils.remote_templates import pull_image_from_url
 from memer.utils.settings import Template
 from memer.utils.settings import TemplateToPull
-from memer.utils.settings import configuration
+from memer.core.container import get_container
 from memer.utils.settings import get_user_data_templates_path
 from memer.utils.settings import load_default_template_list
 
@@ -22,7 +22,7 @@ console = Console()
 
 logger = logging.getLogger(__name__)
 
-app = typer.Typer(no_args_is_help=configuration.interface.typer.no_arg_is_help)
+app = typer.Typer(no_args_is_help=True)
 
 
 # We do not use the default, typer infered name here,
@@ -44,7 +44,8 @@ def list_templates(
         None
     """
     # TODO(Mateusz): docstring looks weird with the line breaks
-    discovered_templates = configuration.images.templates.discovered_templates
+    container = get_container()
+    discovered_templates = container.configuration.images.templates.discovered_templates
     _echo_templates(
         templates=discovered_templates.values(),
         attributes=["name", "path", "key"] if verbose else ["name"],
@@ -64,7 +65,8 @@ def search(phrase: str) -> None:
     # TODO(Mateusz): add option to have raw output in order to pipe it to create meme
     # TODO(Mateusz): maybe make interactive? prompt_toolkit could help
     search_phrase = phrase.strip().strip('"').strip("'").lower()
-    discovered_templates = configuration.images.templates.discovered_templates
+    container = get_container()
+    discovered_templates = container.configuration.images.templates.discovered_templates
     matching_templates = [
         template
         for template in discovered_templates.values()
@@ -125,12 +127,13 @@ def pull(
         logger.debug("Pulling template from URL: %s", str(meme_to_pull.url))
 
         try:
+            container = get_container()
             downloaded_template_path = pull_image_from_url(
                 url=meme_to_pull.url,
                 target_dir_path=user_data_template_path,
-                timeout=configuration.images.remote.timeout,
+                timeout=container.configuration.images.remote.timeout,
                 name=meme_to_pull.name,
-                verify_ssl=configuration.images.remote.verify_ssl,
+                verify_ssl=container.configuration.images.remote.verify_ssl,
             )
             rich.print(
                 f"[bold]Template downloaded to:[/bold] {downloaded_template_path}")

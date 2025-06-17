@@ -12,13 +12,13 @@ from memer.utils.images import create_meme
 from memer.utils.images import generate_meme_name
 from memer.utils.images import load_image
 from memer.utils.settings import Template
-from memer.utils.settings import configuration
+from memer.core.container import get_container
 
 console = Console()
 
 logger = logging.getLogger(__name__)
 
-app = typer.Typer(no_args_is_help=configuration.interface.typer.no_arg_is_help)
+app = typer.Typer(no_args_is_help=True)
 
 top_level_command_name = "create"
 
@@ -65,13 +65,14 @@ def create(
 
     # In all other cases, we load it by name
     else:
-        template = configuration.images.templates.discovered_templates[template_name]
+        container = get_container()
+        template = container.configuration.images.templates.discovered_templates[template_name]
         image = load_image(file_path=template.path)
 
     meme = create_meme(
         image=image,
         meme_text=MemeText(top_text=top_text, bottom_text=bottom_text),
-        text_configuration=configuration.text,
+        text_configuration=container.configuration.text,
     )
     # Current working directory / meme template name (path stem) + date. png
     default_output_path = generate_meme_name(template_stem=template.path.stem)
